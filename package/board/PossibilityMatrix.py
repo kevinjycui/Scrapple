@@ -40,19 +40,23 @@ class PossibilityMatrix:
 
         x, y = pos
 
+        # Not possible or already filled
         if x < 0 or y < 0 or x >= 15 or y >= 15 or not self.board.is_empty(x, y):
             return
         
+        # Orthogonal higher
         x1, y1 = self.orth_step_rev(x, y)
         while x1 >= 0 and y1 >= 0 and not self.board.is_empty(x1, y1):
-            prefix = self.board.get_letter(x1, y1).decode("utf-8") + prefix
+            prefix = self.board.get_letter(x1, y1) + prefix
             x1, y1 = self.orth_step_rev(x1, y1)
         
+        # Orthogonal lower
         x2, y2 = self.orth_step(x, y)
         while x2 < 15 and y2 < 15 and not self.board.is_empty(x2, y2):
-            suffix += self.board.get_letter(x2, y2).decode("utf-8")
+            suffix += self.board.get_letter(x2, y2)
             x2, y2 = self.orth_step(x2, y2)
 
+        # Has letters orthogonally lower only
         if prefix == '' and suffix != '':
             possible = []
             for head in self.board.context.trie.root.children.values():
@@ -60,6 +64,7 @@ class PossibilityMatrix:
                     possible.append(head.letter)
             self.matrix[y][x] = ''.join(possible)
 
+        # Has letters orthogonally higher only
         elif prefix != '' and suffix == '':
             possible = []
             for tail in self.board.context.trie_reverse.root.children.values():
@@ -67,6 +72,7 @@ class PossibilityMatrix:
                     possible.append(tail.letter)
             self.matrix[y][x] = ''.join(possible)
 
+        # Has letters orthogonally on both sides
         elif prefix != '' and suffix != '':
             node = self.board.context.trie.root.get(prefix)
             if node is None:
