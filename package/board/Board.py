@@ -45,19 +45,11 @@ class Board:
         self.board = np.empty((15,15), dtype='S1')
         self.board.fill('-')
         self.adjacents = {(7, 7)}
-        self.anchors = {
-            Direction.DOWN: set(),
-            Direction.RIGHT: set()
-        }
         self.possibilities = {
             Direction.DOWN: PossibilityMatrix(self, Direction.DOWN), 
             Direction.RIGHT: PossibilityMatrix(self, Direction.RIGHT)
         }
         self.letter_bank = INITIAL_LETTER_BANK()
-        self.points_of_interest = []
-
-    def set_points_of_interest(self, points_of_interest):
-        self.points_of_interest = points_of_interest
 
     def is_blank(self, x, y):
         letter = self.board[x,y].decode("utf-8")
@@ -75,14 +67,9 @@ class Board:
     def clear(self):
         self.board.fill('-')
         self.adjacents = {(7, 7)}
-        self.anchors = {
-            Direction.DOWN: set(),
-            Direction.RIGHT: set()
-        }
         self.possibilities[Direction.RIGHT].clear()
         self.possibilities[Direction.DOWN].clear()
         self.letter_bank = INITIAL_LETTER_BANK()
-        self.points_of_interest.clear()
 
     def draw_tiles(self, number):
         available = list(map(lambda x: x[0], filter(lambda x: x[1] > 0, self.letter_bank.items())))
@@ -130,34 +117,6 @@ class Board:
             if y+len(word) < 15:
                 self.update_adjacent(x, y+len(word))
 
-    def update_anchor(self, x, y):
-        close = False
-        for poi in self.points_of_interest:
-            xp, yp = poi
-            if distance_from_point(x, y, xp, yp) <= self.context.closeness_threshold:
-                close = True
-        if not close:
-            self.anchors[Direction.RIGHT].discard((x, y))
-            self.anchors[Direction.DOWN].discard((x, y))
-            return
-
-        if (x-1 >= 0 and self.is_empty(x-1, y)) or (x+1 < 15 and self.is_empty(x+1, y)):
-            self.anchors[Direction.RIGHT].add((x, y))
-        else:
-            self.anchors[Direction.RIGHT].discard((x, y))
-            
-        if  (y-1 >= 0 and self.is_empty(x, y-1)) or (y+1 < 15 and self.is_empty(x, y+1)):
-            self.anchors[Direction.DOWN].add((x, y))
-        else:
-            self.anchors[Direction.DOWN].discard((x, y))
-
-    def update_anchors(self, word, pos, direction):
-        x, y = pos
-        for i in range(len(word)):
-            self.update_anchor(x, y)
-            x += direction.value[0]
-            y += direction.value[1]
-
     def can_place_letter(self, letter, pos, direction):
         x, y = pos
         if self.possibilities[direction].is_possible(x, y, letter):
@@ -174,7 +133,6 @@ class Board:
             x += direction.value[0]
             y += direction.value[1]
         self.update_adjacents(word, pos, direction)
-        self.update_anchors(word, pos, direction)
         for adjacent in self.adjacents:
             self.possibilities[Direction.RIGHT].update_possibilities(adjacent)
             self.possibilities[Direction.DOWN].update_possibilities(adjacent)
