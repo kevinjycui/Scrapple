@@ -1,5 +1,5 @@
 class PossibilityMatrix:
-    FULL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    FULL = "ABCDEFGHIJKLMNOPQRSTUVWXYZŔÑ"
     
     def __init__(self, board, direction):
         self.board = board

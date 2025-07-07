@@ -4,7 +4,7 @@ class Trie:
     def __init__(self):
         self.root = TrieNode()
         self.letter_map = {}
-        for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZŔÑ":
             self.letter_map[letter] = []
         
     def add_word(self, word):

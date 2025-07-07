@@ -16,11 +16,12 @@ class TwoByThreeBoardsIter:
         return self.boards.get(i, j)
         
 class TwoByThreeBoards:
-    def __init__(self, trie, trie_reverse, closeness_threshold):
-        self.boards = [[Board(self), Board(self)], [Board(self), Board(self)], [Board(self), Board(self)]]
+    def __init__(self, trie, trie_reverse, INITIAL_LETTER_BANK, closeness_threshold):
         self.trie = trie
         self.trie_reverse = trie_reverse
+        self.INITIAL_LETTER_BANK = INITIAL_LETTER_BANK
         self.closeness_threshold = closeness_threshold
+        self.boards = [[Board(self), Board(self)], [Board(self), Board(self)], [Board(self), Board(self)]]
 
     def get(self, i, j):
         return self.boards[i][j]

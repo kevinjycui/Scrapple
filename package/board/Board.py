@@ -5,58 +5,27 @@ from .PossibilityMatrix import PossibilityMatrix
 
 import random
 
-def INITIAL_LETTER_BANK():
-    return {
-        'A': 9,
-        'B': 2,
-        'C': 2,
-        'D': 4,
-        'E': 12,
-        'F': 2,
-        'G': 3,
-        'H': 2,
-        'I': 9,
-        'J': 1,
-        'K': 1,
-        'L': 4,
-        'M': 2,
-        'N': 6,
-        'O': 8,
-        'P': 2,
-        'Q': 1,
-        'R': 6,
-        'S': 4,
-        'T': 6,
-        'U': 4,
-        'V': 2,
-        'W': 2,
-        'X': 1,
-        'Y': 2,
-        'Z': 1,
-        '#': 2
-    }
-
 def distance_from_point(x, y, xt, yt):
     return abs(x - xt) + abs(y - yt)
 
 class Board:
     def __init__(self, context):
         self.context = context
-        self.board = np.empty((15,15), dtype='S1')
+        self.board = np.empty((15,15), dtype='U1')
         self.board.fill('-')
         self.adjacents = {(7, 7)}
         self.possibilities = {
             Direction.DOWN: PossibilityMatrix(self, Direction.DOWN), 
             Direction.RIGHT: PossibilityMatrix(self, Direction.RIGHT)
         }
-        self.letter_bank = INITIAL_LETTER_BANK()
+        self.letter_bank = self.context.INITIAL_LETTER_BANK()
 
     def is_blank(self, x, y):
-        letter = self.board[x,y].decode("utf-8")
+        letter = self.board[x,y]
         return letter != '-' and letter == letter.lower()
 
     def get_letter(self, x, y):
-        return self.board[x,y].decode("utf-8").upper()
+        return self.board[x,y].upper()
 
     def is_empty(self, x, y):
         return self.get_letter(x, y) == '-'
@@ -69,7 +38,7 @@ class Board:
         self.adjacents = {(7, 7)}
         self.possibilities[Direction.RIGHT].clear()
         self.possibilities[Direction.DOWN].clear()
-        self.letter_bank = INITIAL_LETTER_BANK()
+        self.letter_bank = self.context.INITIAL_LETTER_BANK()
 
     def draw_tiles(self, number):
         available = list(map(lambda x: x[0], filter(lambda x: x[1] > 0, self.letter_bank.items())))
@@ -126,8 +95,7 @@ class Board:
     def place_word(self, word, pos, direction):
         x, y = pos
         for c in word:
-            c_utf = c.encode("utf-8")
-            self.board[x,y] = c_utf
+            self.board[x,y] = c
             self.possibilities[Direction.RIGHT].place_letter(c, (x, y))
             self.possibilities[Direction.DOWN].place_letter(c, (x, y))
             x += direction.value[0]
